@@ -1,20 +1,19 @@
 <p align="center">
   <a href="https://github.com/KimigaiiWuyi/GenshinUID/"><img src="https://s2.loli.net/2023/03/25/bareSdYcsmRPOyZ.png" width="256" height="256" alt="GenshinUID"></a>
 </p>
-<h1 align = "center">GenshinUID 4.0</h1>
+<h1 align = "center">GenshinUID 4.1</h1>
 <h4 align = "center">✨支持OneBot(QQ)、QQ频道、微信、开黑啦、Telegram的全功能原神Bot插件✨</h4>
 <div align = "center">
-        <a href="http://docs.gsuid.gbots.work/#/" target="_blank">安装文档</a> &nbsp; · &nbsp;
-        <a href="http://docs.gsuid.gbots.work/#/CommandList" target="_blank">指令列表</a> &nbsp; · &nbsp;
-        <a href="http://docs.gsuid.gbots.work/#/FAQ">常见问题</a>
+        <a href="https://docs.sayu-bot.com/" target="_blank">安装文档</a> &nbsp; · &nbsp;
+        <a href="https://docs.sayu-bot.com/插件帮助/GenshinUID.html" target="_blank">指令列表</a> &nbsp; · &nbsp;
+        <a href="https://docs.sayu-bot.com/常见问题/">常见问题</a>
 </div>
 <p align="center">
   <a><img src="https://s2.loli.net/2023/03/26/76oWuYJwg18aXL2.jpg"></a>
 </p>
 
 > [!WARNING]
-> 该分支并不是Nonebot2的插件，也不是任何一个其他Bot的插件，具体安装方法请参考[文档](https://docs.gsuid.gbots.work/#/)
-
+> 该分支并不是Nonebot2的插件，也不是任何一个其他Bot的插件，具体安装方法请参考[文档](https://docs.sayu-bot.com/)
 ## 丨感谢
 
 - [PaimonBot](https://github.com/XiaoMiku01/PaimonBot) - 插件原始代码来自于它

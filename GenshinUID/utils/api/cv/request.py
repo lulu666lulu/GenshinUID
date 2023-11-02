@@ -1,10 +1,33 @@
 from urllib.parse import unquote
-from typing import Any, Dict, Union, Literal, Optional
+from typing import Any, Dict, List, Tuple, Union, Literal, Optional
 
 from gsuid_core.logger import logger
 from aiohttp import TCPConnector, ClientSession, ContentTypeError
 
-from .api import DATA_API, MAIN_API, RANK_API, REFRESH_API
+from .api import (
+    DATA_API,
+    MAIN_API,
+    RANK_API,
+    SORT_API,
+    REFRESH_API,
+    ARTI_SORT_API,
+    LEADERBOARD_API,
+)
+
+SUBSTAT_MAP = {
+    '双爆': 'critValue',
+    '百分比攻击力': 'substats.ATK%',
+    '百分比血量': 'substats.HP%',
+    '百分比防御': 'substats.DEF%',
+    '固定攻击力': 'substats.Flat ATK',
+    '固定血量': 'substats.Flat HP',
+    '固定生命': 'substats.Flat HP',
+    '固定防御力': 'substats.Flat DEF',
+    '元素精通': 'substats.Elemental Mastery',
+    '元素充能效率': 'substats.Energy Recharge',
+    '暴击率': 'substats.Crit RATE',
+    '暴击伤害': 'substats.Crit DMG',
+}
 
 
 class _CvApi:
@@ -16,6 +39,84 @@ class _CvApi:
             connector=TCPConnector(verify_ssl=self.ssl_verify)
         )
         self.sessionID = None
+
+    async def get_artifacts_list(
+        self,
+        sort_by: Union[
+            Literal[
+                'critValue',
+                'substats.Flat ATK',
+                'substats.Flat HP',
+                'substats.Flat DEF',
+                'substats.ATK%',
+                'substats.HP%',
+                'substats.DEF%',
+                'substats.Elemental Mastery',
+                'substats.Energy Recharge',
+                'substats.Crit RATE',
+                'substats.Crit DMG',
+            ],
+            str,
+            None,
+        ] = 'critValue',
+    ) -> Optional[List[Dict]]:
+        if sort_by is None or not sort_by:
+            sort_by = 'critValue'
+        if not sort_by.startswith(('c', 's')):
+            for i in SUBSTAT_MAP:
+                if sort_by in i:
+                    sort_by = SUBSTAT_MAP[i]
+                    break
+            else:
+                return None
+        raw_data = await self._cv_request(
+            ARTI_SORT_API.format(sort_by),
+            'GET',
+            self._HEADER,
+        )
+        if isinstance(raw_data, Dict) and 'data' in raw_data:
+            if raw_data['data']:
+                return raw_data['data']
+            else:
+                return None
+
+    async def get_leaderboard_id_list(
+        self, char_id: str
+    ) -> Optional[List[Dict]]:
+        raw_data = await self._cv_request(
+            LEADERBOARD_API.format(char_id),
+            'GET',
+            self._HEADER,
+        )
+        if isinstance(raw_data, Dict) and 'data' in raw_data:
+            if raw_data['data']:
+                return raw_data['data']
+            else:
+                return None
+
+    async def get_calculation_info(
+        self, char_id: str
+    ) -> Optional[Tuple[str, int]]:
+        raw_data = await self.get_leaderboard_id_list(char_id)
+        if raw_data is not None:
+            return (
+                raw_data[0]['weapons'][0]['calculationId'],
+                raw_data[0]['count'],
+            )
+
+    async def get_sort_list(
+        self, char_id: str
+    ) -> Optional[Tuple[List[Dict], int]]:
+        _raw_data = await self.get_calculation_info(char_id)
+        if _raw_data is not None:
+            calculation_id, count = _raw_data
+            raw_data = await self._cv_request(
+                SORT_API.format(calculation_id),
+                'GET',
+                self._HEADER,
+            )
+            if isinstance(raw_data, Dict) and 'data' in raw_data:
+                return raw_data['data'], count
 
     async def get_session_id(self) -> str:
         async with self.session.get(MAIN_API) as resp:
